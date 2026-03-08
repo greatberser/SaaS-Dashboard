@@ -1,8 +1,8 @@
 import type { Metadata } from 'next';
 import { Geist } from 'next/font/google';
 import './globals.css';
-import Sidebar from '@/components/layout/Sidebar';
 import ThemeProvider from '@/components/providers/ThemeProvider';
+import { AuthProvider } from '@/context/AuthContext';
 import { Toaster } from '@/components/ui/sonner';
 
 const geist = Geist({ subsets: ['latin'], variable: '--font-geist-sans' });
@@ -17,12 +17,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" suppressHydrationWarning>
       <body className={`${geist.variable} font-sans antialiased`}>
         <ThemeProvider>
-          <div className="flex h-screen overflow-hidden bg-background">
-            <Sidebar />
-            <div className="flex flex-1 flex-col overflow-hidden">
-              {children}
-            </div>
-          </div>
+          <AuthProvider>
+            {children}
+          </AuthProvider>
           <Toaster position="bottom-right" richColors closeButton />
         </ThemeProvider>
       </body>

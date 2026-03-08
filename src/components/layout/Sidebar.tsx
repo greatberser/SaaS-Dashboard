@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import {
   LayoutDashboard,
   CheckSquare,
@@ -9,9 +9,11 @@ import {
   Zap,
   ChevronLeft,
   ChevronRight,
+  LogOut,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useState } from 'react';
+import { useAuth } from '@/context/AuthContext';
 
 const navItems = [
   { href: '/', label: 'Dashboard', icon: LayoutDashboard },
@@ -21,7 +23,14 @@ const navItems = [
 
 export default function Sidebar() {
   const pathname = usePathname();
+  const router = useRouter();
+  const { user, logout } = useAuth();
   const [collapsed, setCollapsed] = useState(false);
+
+  function handleLogout() {
+    logout();
+    router.replace('/login');
+  }
 
   return (
     <aside
@@ -71,20 +80,27 @@ export default function Sidebar() {
         {collapsed ? <ChevronRight className="h-3 w-3" /> : <ChevronLeft className="h-3 w-3" />}
       </button>
 
-      {/* Bottom user hint */}
-      {!collapsed && (
-        <div className="border-t border-border p-3">
-          <div className="flex items-center gap-2 rounded-md px-3 py-2">
-            <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-violet-500 text-xs font-semibold text-white">
-              AT
-            </div>
-            <div className="min-w-0">
-              <p className="truncate text-xs font-medium text-foreground">Alex Turner</p>
-              <p className="truncate text-[10px] text-muted-foreground">Admin</p>
-            </div>
+      {/* Bottom user section */}
+      <div className="border-t border-border p-3">
+        <div className="flex items-center gap-2 rounded-md px-3 py-2">
+          <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-violet-500 text-xs font-semibold text-white">
+            {user?.avatarInitials ?? '?'}
           </div>
+          {!collapsed && (
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-xs font-medium text-foreground">{user?.name ?? ''}</p>
+              <p className="truncate text-[10px] text-muted-foreground">{user?.role ?? ''}</p>
+            </div>
+          )}
+          <button
+            onClick={handleLogout}
+            title="Sign out"
+            className="ml-auto shrink-0 text-muted-foreground hover:text-foreground"
+          >
+            <LogOut className="h-3.5 w-3.5" />
+          </button>
         </div>
-      )}
+      </div>
     </aside>
   );
 }

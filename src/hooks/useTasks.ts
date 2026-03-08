@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Task, TaskStatus, TaskPriority } from '@/types';
 import { tasks as initialTasks } from '@/data/mockData';
 
@@ -18,7 +18,14 @@ const PRIORITY_ORDER: Record<TaskPriority, number> = { high: 0, medium: 1, low: 
 const STATUS_ORDER: Record<TaskStatus, number> = { 'in-progress': 0, todo: 1, done: 2, cancelled: 3 };
 
 export function useTasks() {
-  const [tasks, setTasks] = useState<Task[]>(initialTasks);
+  const [tasks, setTasks] = useState<Task[]>(() => {
+    try {
+      const stored = localStorage.getItem('tasks');
+      return stored ? JSON.parse(stored) : initialTasks;
+    } catch {
+      return initialTasks;
+    }
+  });
   const [filters, setFilters] = useState<TaskFilters>({
     search: '',
     status: 'all',
@@ -29,6 +36,10 @@ export function useTasks() {
   const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 8;
+
+  useEffect(() => {
+    localStorage.setItem('tasks', JSON.stringify(tasks));
+  }, [tasks]);
 
   const filteredTasks = useMemo(() => {
     let result = [...tasks];
