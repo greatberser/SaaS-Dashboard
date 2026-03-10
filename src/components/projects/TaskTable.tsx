@@ -29,6 +29,7 @@ import {
   ChevronLeft, ChevronRight, ChevronDown,
 } from 'lucide-react';
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import TaskModal from './TaskModal';
 import { projects } from '@/data/mockData';
@@ -61,6 +62,7 @@ export default function TaskTable() {
     toggleSubtask,
   } = useTasks();
 
+  const router = useRouter();
   const loading = useSimulatedLoading(900);
   const [modalOpen, setModalOpen] = useState(false);
   const [editingTaskId, setEditingTaskId] = useState<string | null>(null);
@@ -188,7 +190,12 @@ export default function TaskTable() {
 
                       {/* Title + subtask progress */}
                       <TableCell className="font-medium max-w-[200px]">
-                        <p className="truncate text-sm">{task.title}</p>
+                        <p
+                          className="truncate text-sm cursor-pointer hover:text-primary hover:underline transition-colors"
+                          onClick={() => router.push(`/projects/${task.id}`)}
+                        >
+                          {task.title}
+                        </p>
                         <p className="truncate text-[11px] text-muted-foreground hidden sm:block">{task.description}</p>
                         {subtotalCount > 0 && (
                           <div className="mt-1.5 flex items-center gap-2">
